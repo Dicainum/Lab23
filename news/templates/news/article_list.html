@@ -1,0 +1,29 @@
+{% extends "news/base.html" %}
+{% block title %}Latest News{% endblock %}
+{% block content %}
+  <div class="search">
+    <form method="get">
+      <input type="text" name="q" placeholder="Filter by title" value="{{ request.GET.q|default_if_none:'' }}">
+      <button type="submit">Search</button>
+    </form>
+  </div>
+
+  {% for article in articles %}
+    <div class="article">
+      <h2><a href="{% url 'news:detail' article.pk %}">{{ article.title }}</a></h2>
+      <div class="meta">By {{ article.author.username }} — {{ article.created_at|date:"Y-m-d H:i" }}</div>
+      <p>{{ article.content|truncatechars:200 }}</p>
+    </div>
+  {% empty %}
+    <p>No articles yet.</p>
+  {% endfor %}
+
+  {# Pagination controls (optional) #}
+  {% if is_paginated %}
+    <div>
+      {% if page_obj.has_previous %}<a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>{% endif %}
+      <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}<a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ page_obj.next_page_number }}">Next</a>{% endif %}
+    </div>
+  {% endif %}
+{% endblock %}
